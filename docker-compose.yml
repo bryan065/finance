@@ -1,0 +1,58 @@
+# docker-compose.yml
+# ─────────────────────────────────────────────
+# Services:
+#   db  — PostgreSQL 16 (persisted data volume)
+#   app — Next.js fin app (built from Dockerfile)
+#
+# Quick reference:
+#   Start:        docker compose up -d
+#   Stop:         docker compose down
+#   Rebuild app:  docker compose build app
+#   Reset DB:     docker compose down -v   ← WARNING: deletes all data
+#   Logs:         docker compose logs -f app
+# ─────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL ──────────────────────────────
+  db:
+    image: postgres:16
+    container_name: fin-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       fin
+      POSTGRES_USER:     fin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fin_local}
+    ports:
+      - "5432:5432"             # remove this line on the home server if you don't need external access
+    volumes:
+      - fin-db-data:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fin -d fin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Next.js app ─────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fin-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy   # wait until Postgres is ready
+    ports:
+      - "3000:3000"
+    environment:
+      # Postgres connection — uses the internal Docker network hostname "db"
+      DATABASE_URL: postgres://fin:${POSTGRES_PASSWORD:-fin_local}@db:5432/fin
+      # Anthropic API key — set in .env or export in your shell
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      NODE_ENV: production
+
+volumes:
+  fin-db-data:
