@@ -33,7 +33,8 @@ WORKDIR /app
 
 # Copy all dependencies (including devDeps for the build)
 COPY package.json package-lock.json* ./
-RUN npm ci
+#RUN npm ci
+RUN NODE_ENV=development npm i
 
 # Copy source
 COPY . .
