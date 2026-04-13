@@ -51,5 +51,5 @@ services:
       # Postgres connection — uses the internal Docker network hostname "db"
       DATABASE_URL: postgres://fin:${POSTGRES_PASSWORD:-fin_local}@db:5432/fin
       # Anthropic API key — set in .env or export in your shell
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      NODE_ENV: production
+      #ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      #NODE_ENV: production
