@@ -26,9 +26,9 @@ services:
     ports:
       - "5432:5432"             # remove this line on the home server if you don't need external access
     volumes:
-      - '${DATABASE_PATH}:/var/lib/postgresql/data'
-      - #${DATABASE_PATH_SCHEMA}./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql    # PATH: ./db/schema
-      - #${DATABASE_PATH_SEED}./db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql          # PATH: ./db/seed
+      - ${DATABASE_PATH}:/var/lib/postgresql/data
+      #- ${DATABASE_PATH_SCHEMA}./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql    # PATH: ./db/schema
+      #- ${DATABASE_PATH_SEED}./db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql          # PATH: ./db/seed
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U fin -d fin"]
       interval: 10s
