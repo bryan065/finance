@@ -45,6 +45,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # DATABASE_URL and ANTHROPIC_API_KEY are runtime-only — not needed at build time
 RUN npm run build
 
+RUN chown -R 1001:1001 /app
 
 # ── Stage 3: runtime ──────────────────────────
 FROM node:20-alpine AS runner
